@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16            # imagem oficial do Postgres, versão 16
+    container_name: encurtador-db # nome do container, pra achar fácil
+    environment:
+      POSTGRES_DB: encurtador       # nome do banco criado ao iniciar
+      POSTGRES_USER: encurtador     # usuário
+      POSTGRES_PASSWORD: encurtador # senha (só pra desenvolvimento!)
+    ports:
+      - "3245:5432"               # porta do seu PC : porta do container
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # guarda os dados fora do container
+
+volumes:
+  pgdata:
