@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Encurtador de Links</title>
+    <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-$END$
+<h1>Encurtador de Links</h1>
+
+<form id="formulario">
+    <input type="url" id="campo-url" placeholder="Cole aqui a URL longa" required>
+    <button type="submit">Encurtar</button>
+</form>
+
+<p id="erro"></p>
+
+<h2>Meus links</h2>
+<ul id="lista"></ul>
+
+<script src="app.js"></script>
 </body>
 </html>
