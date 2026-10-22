@@ -3,8 +3,11 @@ package br.com.encurtador.encurtador.link;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
+import java.util.List;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 
 @Service
 public class LinkService {
@@ -15,11 +18,13 @@ public class LinkService {
 
     private final SecureRandom random = new SecureRandom();
     private final LinkRepository repository;
+    private final CliqueRepository cliqueRepository;
     private final String baseUrl;
 
-    public LinkService(LinkRepository repository,
+    public LinkService(LinkRepository repository, CliqueRepository cliqueRepository,
                        @Value("${app.base-url}") String baseUrl){
         this.repository = repository;
+        this.cliqueRepository = cliqueRepository;
         this.baseUrl = baseUrl;
     }
 
@@ -29,6 +34,13 @@ public class LinkService {
 
         Link link = repository.save(new Link (code, request.url()));
         return paraResposta(link);
+    }
+
+    public List<LinkResponse> listar(){
+        return repository.findAll(Sort.by(Sort.Direction.DESC, "criadoEm"))
+                .stream()
+                .map(this::paraResposta)
+                .toList();
     }
 
     private String gerarCodigoUnico(){
@@ -57,6 +69,23 @@ public class LinkService {
                 baseUrl + "/" + link.getCode(),
                 link.getCriadoEm()
         );
+    }
+
+    @Transactional
+    public Optional<String> registrarCliques (String code){
+
+        Optional<Link> link = repository.findByCode(code);
+       link.ifPresent(l -> cliqueRepository.save(new Clique(l)));
+               return link.map(Link::getUrlOriginal);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<EstatisticasResponse> estatisticas(String code){
+        return repository.findByCode(code)
+                .map(link -> new EstatisticasResponse(
+                        link.getCode(),
+                        cliqueRepository.countByLink((link)
+                        ), cliqueRepository.contarPorDia(link)));
     }
 
 
